@@ -32,11 +32,19 @@ def _require_api_key(key: str = Security(_api_key_header)) -> str:
 
 
 async def _download(url: str) -> bytes:
-    async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
-        r = await client.get(url)
-        if r.status_code != 200:
-            raise HTTPException(status_code=400, detail=f"Не удалось скачать файл: HTTP {r.status_code}")
-        return r.content
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
+            r = await client.get(url)
+            if r.status_code != 200:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Не удалось скачать файл: HTTP {r.status_code} — {r.text[:300]}",
+                )
+            return r.content
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Ошибка при скачивании: {type(exc).__name__}: {exc}")
 
 
 # ── multipart endpoints (для прямых curl/Swagger вызовов) ──────────────────
