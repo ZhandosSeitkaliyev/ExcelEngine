@@ -41,11 +41,5 @@ $env:API_KEY="mysecretkey"          # Windows PowerShell
 uvicorn app.main:app --reload --port 8000
 ```
 
-## Запуск тестов
-
-```bash
-cd ExcelEngine
-python -m pytest tests/ -v
-```
 
 
